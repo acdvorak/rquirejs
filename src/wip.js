@@ -13,7 +13,7 @@
         return _modules[path]();
     };
 
-    var define = function(path, def) {
+    var _define = function(path, def) {
         _modules[path] = (function() {
             var module;
 
@@ -29,9 +29,9 @@
         }());
     };
 
-    define('utils', function(module, exports) {
+    _define('utils', function(module, exports) {
         // Hide globals
-        var root, _modules, _pathMap;
+        var root, _modules, _pathMap, _define;
 
         /*! Module source code goes here */
         module.exports = {
@@ -41,9 +41,9 @@
         };
     });
 
-    define('modules/counter', function(module, exports) {
+    _define('modules/counter', function(module, exports) {
         // Hide globals
-        var root, _modules, _pathMap;
+        var root, _modules, _pathMap, _define;
 
         /*! Module source code goes here */
         var _private = 1;
@@ -54,9 +54,9 @@
         };
     });
 
-    define('main', function(module, exports) {
+    _define('main', function(module, exports) {
         // Hide globals
-        var root, _modules, _pathMap;
+        var root, _modules, _pathMap, _define;
 
         /*! Module source code goes here */
         var _utils = require('utils'),
