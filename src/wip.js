@@ -8,7 +8,7 @@
         'shortName': 'long/path/to/file_without_extension'
     };
 
-    var require = root.require = function(path) {
+    var require = function(path) {
         path = _pathMap[path] || path;
         return _modules[path]();
     };
@@ -68,5 +68,10 @@
         };
 
     });
+
+    // Expose an external API
+    root.increment = function() {
+        require('utils').alert(require('modules/inc').increment());
+    };
 
 }(window));
