@@ -1,50 +1,58 @@
-(function(root) {
+(function(definitions) {
 
-    var _modules = {
-        'path/to/js/module_without_extension': function() { return module; }
-    };
+    (function(root) {
 
-    var _pathMap = {
-        'shortName': 'long/path/to/file_without_extension'
-    };
+        var _modules = {
+            'root': function() { return root; },
+            'path/to/js/module_without_extension': function() { return module; }
+        };
 
-    var require = function(path) {
-        path = _pathMap[path] || path;
-        return _modules[path]();
-    };
+        var _pathMap = {
+            'shortName': 'long/path/to/file_without_extension'
+        };
 
-    var _define = function(path, def) {
-        _modules[path] = (function() {
-            var module;
+        var require = function(path) {
+            path = _pathMap[path] || path;
+            return _modules[path]();
+        };
 
-            // Memo
-            return function() {
-                if (module) {
+        var _define = function(path, def) {
+            _modules[path] = (function() {
+                var module;
+
+                // Memo
+                return function() {
+                    if (module) {
+                        return module.exports;
+                    }
+                    module = { exports: {} };
+                    def(require, module, module.exports);
                     return module.exports;
-                }
-                module = { exports: {} };
-                def(module, module.exports);
-                return module.exports;
-            };
-        }());
-    };
+                };
+            }());
+        };
 
-    _define('utils', function(module, exports) {
-        // Hide globals
-        var root, _modules, _pathMap, _define;
+        for (var path in definitions) {
+            _define(path, definitions[path]);
+        }
 
+        // Expose an external API
+        root.start = function() {
+            require('main').run();
+        };
+
+    }(window));
+
+}({
+    'utils': function(require, module, exports) {
         /*! Module source code goes here */
         module.exports = {
             alert: function() {
                 window.alert.apply(null, arguments);
             }
         };
-    });
-
-    _define('modules/counter', function(module, exports) {
-        // Hide globals
-        var root, _modules, _pathMap, _define;
-
+    },
+    'modules/counter': function(require, module, exports) {
         /*! Module source code goes here */
         var _private = 1;
         module.exports = {
@@ -52,12 +60,8 @@
                 return _private++;
             }
         };
-    });
-
-    _define('main', function(module, exports) {
-        // Hide globals
-        var root, _modules, _pathMap, _define;
-
+    },
+    'main': function(require, module, exports) {
         /*! Module source code goes here */
         var _utils = require('utils'),
             _counter = require('modules/counter');
@@ -68,11 +72,5 @@
                 };
             }
         };
-    });
-
-    // Expose an external API
-    root.start = function() {
-        require('main').run();
-    };
-
-}(window));
+    }
+}));
