@@ -13,15 +13,8 @@
         return _modules[path]();
     };
 
-    var define = function(path, fn) {
-
+    var define = function(path, def) {
         _modules[path] = (function() {
-            // Hide globals
-            var root,
-                _modules,
-                _pathMap,
-                x;
-
             var module;
 
             // Memo
@@ -29,21 +22,16 @@
                 if (module) {
                     return module.exports;
                 }
-
-                module = {
-                    exports: {}
-                };
-
-                fn(module, module.exports);
-
+                module = { exports: {} };
+                def(module, module.exports);
                 return module.exports;
             };
-
         }());
-
     };
 
     define('utils', function(module, exports) {
+        // Hide globals
+        var root, _modules, _pathMap;
 
         /*! Module source code goes here */
         module.exports = {
@@ -51,10 +39,11 @@
                 window.alert.apply(null, arguments);
             }
         };
-
     });
 
     define('modules/counter', function(module, exports) {
+        // Hide globals
+        var root, _modules, _pathMap;
 
         /*! Module source code goes here */
         var _private = 1;
@@ -63,10 +52,11 @@
                 return _private++;
             }
         };
-
     });
 
     define('main', function(module, exports) {
+        // Hide globals
+        var root, _modules, _pathMap;
 
         /*! Module source code goes here */
         var _utils = require('utils'),
@@ -78,7 +68,6 @@
                 };
             }
         };
-
     });
 
     // Expose an external API
