@@ -46,7 +46,6 @@
     define('utils', function(module, exports) {
 
         /*! Module source code goes here */
-        var _private = 1;
         module.exports = {
             alert: function() {
                 window.alert.apply(null, arguments);
@@ -55,9 +54,7 @@
 
     });
 
-    define('modules/inc', function(module, exports) {
-
-        var _utils = require('utils');
+    define('modules/counter', function(module, exports) {
 
         /*! Module source code goes here */
         var _private = 1;
@@ -69,9 +66,24 @@
 
     });
 
+    define('main', function(module, exports) {
+
+        /*! Module source code goes here */
+        var _utils = require('utils'),
+            _counter = require('modules/counter');
+        module.exports = {
+            run: function() {
+                document.onclick = function() {
+                    _utils.alert(_counter.increment());
+                };
+            }
+        };
+
+    });
+
     // Expose an external API
-    root.increment = function() {
-        require('utils').alert(require('modules/inc').increment());
+    root.start = function() {
+        require('main').run();
     };
 
 }(window));
