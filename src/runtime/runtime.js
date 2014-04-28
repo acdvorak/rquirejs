@@ -1,4 +1,4 @@
-(function(definitions) {
+(function(config, definitions) {
 
     (function(root) {
 
@@ -43,34 +43,52 @@
 
     }(window));
 
-}({
-    'utils': function(require, module, exports) {
-        /*! Module source code goes here */
-        module.exports = {
-            alert: function() {
-                window.alert.apply(null, arguments);
-            }
-        };
+}(
+    {
+        src: 'src/',
+        main: 'main.js',
+        module_dir: 'modules/',
+        modules: [
+            'array',
+            'attr',
+            'class',
+            'css',
+            'data',
+            'dimension',
+            'event',
+            'form'
+        ],
+        dist: 'dist/'
     },
-    'modules/counter': function(require, module, exports) {
-        /*! Module source code goes here */
-        var _private = 1;
-        module.exports = {
-            increment: function() {
-                return _private++;
-            }
-        };
-    },
-    'main': function(require, module, exports) {
-        /*! Module source code goes here */
-        var _utils = require('utils'),
-            _counter = require('modules/counter');
-        module.exports = {
-            run: function() {
-                document.onclick = function() {
-                    _utils.alert(_counter.increment());
-                };
-            }
-        };
+    {
+        'utils': function(require, module, exports) {
+            /*! Module source code goes here */
+            module.exports = {
+                alert: function() {
+                    window.alert.apply(null, arguments);
+                }
+            };
+        },
+        'modules/counter': function(require, module, exports) {
+            /*! Module source code goes here */
+            var _private = 1;
+            module.exports = {
+                increment: function() {
+                    return _private++;
+                }
+            };
+        },
+        'main': function(require, module, exports) {
+            /*! Module source code goes here */
+            var _utils = require('utils'),
+                _counter = require('modules/counter');
+            module.exports = {
+                run: function() {
+                    document.onclick = function() {
+                        _utils.alert(_counter.increment());
+                    };
+                }
+            };
+        }
     }
-}));
+));
