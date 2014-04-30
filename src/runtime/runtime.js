@@ -11,12 +11,19 @@
             'shortName': 'long/path/to/file_without_extension'
         };
 
+        var _normalize = function(path) {
+            return path && /\.js$/.test(path) ? path.replace(/\.js$/, '') : path;
+        };
+
         var require = function(path) {
+            path = _normalize(path);
             path = _pathMap[path] || path;
+            path = _normalize(path);
             return _modules[path]();
         };
 
         var _define = function(path, def) {
+            path = _normalize(path);
             _modules[path] = (function() {
                 var module;
 
