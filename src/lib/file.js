@@ -31,18 +31,9 @@ var File = function(srcRoot, pathRel) {
 };
 
 var _match = function(stripped, regex) {
-    regex.lastIndex = -1;
     return (stripped.match(regex) || [])
         .map(function(str) {
-            console.log('str = "' + str + '" (' + (typeof str) + ')');
-
-            var t = regex.test(str);
-            console.log('t = ', t);
-
-            var m = regex.exec(str);
-            console.log('m = ', m);
-
-            return m;
+            return new RegExp(regex).exec(str);
         });
 };
 
@@ -61,18 +52,13 @@ File.prototype = {
     },
 
     _getDirectDependencies: function() {
-        console.log('RRR: ', rRequireSingleQuote.exec("require('./modules/array-internal')"));
         var self = this
           , stripped = this.strippedFileContents
           , single   = _match(stripped, rRequireSingleQuote)
           , double   = _match(stripped, rRequireDoubleQuote)
           , matches  = [].concat(single).concat(double)
         ;
-        console.log('single: ', single);
-        console.log('double: ', double);
-        console.log('matches: ', matches);
         return matches.map(function(match) {
-            console.log('match: ', match);
             var depPathRelToSelf = rJSExt.test(match[1]) ? match[1] : match[1] + '.js'
               , depPathAbs = path.resolve(self.parentAbs, depPathRelToSelf)
               , depPathRelToRoot = path.relative(self.srcRoot, depPathAbs)

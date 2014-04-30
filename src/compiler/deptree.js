@@ -93,7 +93,7 @@ DepTree.prototype = {
      * @private
      */
     _onEnd: function() {
-        console.log('end: ', this.allSrcFiles);
+        console.log('end');
         this._buildTree();
     },
 
@@ -127,11 +127,8 @@ DepTree.prototype = {
 
         var self = this;
         var deps = file.directDependencies.map(function(pathRel) {
-            console.log('pathRel = ', pathRel);
             return self.srcFileMap[pathRel];
         });
-
-        console.log('deps: ', deps);
 
         deps.forEach(function(depFile) {
             self._buildTreeImpl(depMap, depFile);
