@@ -55,16 +55,17 @@ File.prototype = {
     },
 
     _getFileContentsPathNormalized: function() {
-        var self = this;
         var fileContents = this.fileContents;
-        fileContents = fileContents.replace(rRequireSingleQuote, function(matchSubstring, badPath, offset, totalString) {
-            return matchSubstring.replace(badPath, self._pathNormMap[badPath]);
-        });
-        fileContents = fileContents.replace(rRequireDoubleQuote, function(matchSubstring, badPath, offset, totalString) {
-            return matchSubstring.replace(badPath, self._pathNormMap[badPath]);
-        });
-        console.log(fileContents);
+        fileContents = this._normalize(fileContents, rRequireSingleQuote);
+        fileContents = this._normalize(fileContents, rRequireDoubleQuote);
         return fileContents;
+    },
+
+    _normalize: function(contents, regex) {
+        var self = this;
+        return contents.replace(regex, function(matchSubstring, badPath, offset, totalString) {
+            return matchSubstring.replace(badPath, self._pathNormMap[badPath]);
+        });
     },
 
     _getDirectDependencies: function() {
