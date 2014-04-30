@@ -1,8 +1,7 @@
 {
-    "node": false,
+    "node": true,
+    "laxcomma": true,
+    "laxbreak": true,
     "predef": [
-        "document",
-        "window",
-        "root"
     ]
 }
