@@ -6,7 +6,7 @@ var DepTree = require('./src/compiler/deptree.js');
 var tree = new DepTree('/Users/acdvorak/dev/libs/rquirejs/example/src', [ 'main.js' ]);
 tree.scan(function() {
     console.log('DONE!');
-    console.log(tree.depFiles.map(function(file) { return (file.pathRel); }));
+    console.log(tree.depFiles.map(function(file) { return (file.fileContentsPathNormalized && file.pathRel); }));
 });
 
 //*/

@@ -1,9 +1,11 @@
 (function(config, definitions) {
 
-    (function(root) {
+    (function(root, win, doc) {
 
         var _modules = {
             'root': function() { return root; },
+            'window': function() { return win; },
+            'document': function() { return doc; },
             'path/to/js/module_without_extension': function() { return module; }
         };
 
@@ -11,8 +13,9 @@
             'shortName': 'long/path/to/file_without_extension'
         };
 
+        var rjsExt = /\.js$/;
         var _normalize = function(path) {
-            return path && /\.js$/.test(path) ? path.replace(/\.js$/, '') : path;
+            return path && rjsExt.test(path) ? path.replace(rjsExt, '') : path;
         };
 
         var require = function(path) {
@@ -43,33 +46,20 @@
             _define(path, definitions[path]);
         }
 
-        // Expose an external API
-        root.start = function() {
-            require('main').run();
-        };
+        require(config.main || 'main');
 
-    }(window));
+    }(window, window, document));
 
 }(
     {
-        src: 'src/',
-        main: 'main.js',
-        module_dir: 'modules/',
-        modules: [
-            'array',
-            'attr',
-            'class',
-            'css',
-            'data',
-            'dimension',
-            'event',
-            'form'
-        ],
-        dist: 'dist/'
+        main: 'main'
     },
     {
-        'utils': function(require, module, exports) {
+        'util': function(require, module, exports) {
             /*! Module source code goes here */
+
+            var window = require('window');
+
             module.exports = {
                 alert: function() {
                     window.alert.apply(null, arguments);
@@ -87,14 +77,23 @@
         },
         'main': function(require, module, exports) {
             /*! Module source code goes here */
-            var _utils = require('utils'),
-                _counter = require('modules/counter');
+
+            var root = require('root')
+              , document = require('document')
+              , _utils = require('util')
+              , _counter = require('modules/counter')
+            ;
+
             module.exports = {
                 run: function() {
                     document.onclick = function() {
                         _utils.alert(_counter.increment());
                     };
                 }
+            };
+
+            root.start = function() {
+                module.exports.run();
             };
         }
     }

@@ -2,8 +2,8 @@ var fs = require('fs')
   , path = require('path')
 ;
 
-var rRequireSingleQuote = /require\s*\(\s*'([^']+?)'\s*\)/g
-  , rRequireDoubleQuote = /require\s*\(\s*"([^"]+?)"\s*\)/g
+var rRequireSingleQuote = /require\s*\(\s*'(\.[^']+?)'\s*\)/g
+  , rRequireDoubleQuote = /require\s*\(\s*"(\.[^"]+?)"\s*\)/g
 ;
 
 var rBlockComment = new RegExp('/\\*[\\s\\S]*?\\*/', 'g')
@@ -27,7 +27,10 @@ var File = function(srcRoot, pathRel) {
 
     this._fileContents = null;
     this._strippedFileContents = null;
+    this._fileContentsPathNormalized = null;
     this._directDependencies = null;
+
+    this._pathNormMap = {};
 };
 
 var _match = function(stripped, regex) {
@@ -51,6 +54,19 @@ File.prototype = {
         ;
     },
 
+    _getFileContentsPathNormalized: function() {
+        var self = this;
+        var fileContents = this.fileContents;
+        fileContents = fileContents.replace(rRequireSingleQuote, function(matchSubstring, badPath, offset, totalString) {
+            return matchSubstring.replace(badPath, self._pathNormMap[badPath]);
+        });
+        fileContents = fileContents.replace(rRequireDoubleQuote, function(matchSubstring, badPath, offset, totalString) {
+            return matchSubstring.replace(badPath, self._pathNormMap[badPath]);
+        });
+        console.log(fileContents);
+        return fileContents;
+    },
+
     _getDirectDependencies: function() {
         var self = this
           , stripped = this.strippedFileContents
@@ -63,6 +79,7 @@ File.prototype = {
               , depPathAbs = path.resolve(self.parentAbs, depPathRelToSelf)
               , depPathRelToRoot = path.relative(self.srcRoot, depPathAbs)
             ;
+            self._pathNormMap[match[1]] = depPathRelToRoot;
             return depPathRelToRoot;
         });
     },
@@ -84,6 +101,12 @@ Object.defineProperties(File.prototype, {
     strippedFileContents: {
         get: function() {
             return this._strippedFileContents || (this._strippedFileContents = this._getStrippedFileContents());
+        }
+    },
+
+    fileContentsPathNormalized: {
+        get: function() {
+            return this._fileContentsPathNormalized || (this._fileContentsPathNormalized = this._getFileContentsPathNormalized());
         }
     },
 
