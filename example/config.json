@@ -12,5 +12,5 @@
         "event",
         "form"
     ],
-    "target": "dist/example.js"
+    "dest": "dist/example.js"
 }

@@ -43,6 +43,7 @@
     }(window, window, document));
 
 }(
+    /*!__CONFIG_START__!*/
     {
         main: '/main.js'
     },
@@ -84,4 +85,5 @@
             };
         }
     }
+    /*!__CONFIG_END__!*/
 ));

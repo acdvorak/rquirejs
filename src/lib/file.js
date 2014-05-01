@@ -48,7 +48,7 @@ var _match = function(stripped, regex) {
 File.prototype = {
 
     _getFileContents: function() {
-        return fs.readFileSync(this.pathAbs, { encoding: 'utf-8' });
+        return fs.readFileSync(this.pathAbs, { encoding: 'utf8' });
     },
 
     _getStrippedFileContents: function() {

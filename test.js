@@ -7,7 +7,8 @@ var compiler = new Compiler({
     "required_modules": [
 //        "array",
 //        "counter"
-    ]
+    ],
+    "dest": "/Users/acdvorak/dev/libs/rquirejs/example/dist/example.js"
 });
 
 compiler.compile();
