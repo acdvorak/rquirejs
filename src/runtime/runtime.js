@@ -19,19 +19,16 @@
         };
 
         var _define = function(path, def) {
-            _modules[path] = (function() {
-                var module;
+            var module;
 
-                // Memo
-                return function() {
-                    if (module) {
-                        return module.exports;
-                    }
-                    module = { exports: {} };
-                    def(require, module, module.exports);
+            _modules[path] = function() {
+                if (module) {
                     return module.exports;
-                };
-            }());
+                }
+                module = { exports: {} };
+                def(require, module, module.exports);
+                return module.exports;
+            };
         };
 
         for (var path in definitions) {
