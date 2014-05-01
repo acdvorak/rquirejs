@@ -4,88 +4,134 @@ var fs = require('fs')
 
 var rRequireSingleQuote = /require\s*\(\s*'(\.[^']+?)'\s*\)/g
   , rRequireDoubleQuote = /require\s*\(\s*"(\.[^"]+?)"\s*\)/g
+
+  , rBlockComment = new RegExp('/\\*[\\s\\S]*?\\*/', 'g')
+  , rLineComment  = new RegExp('//.*', 'g')
+
+  , rJSExt = /\.js$/
 ;
 
-var rBlockComment = new RegExp('/\\*[\\s\\S]*?\\*/', 'g')
-  , rLineComment = new RegExp('//.*', 'g')
-;
-
-var rJSExt = /\.js$/;
-
-var _normalize = function(pathRel) {
+var _canonicalize = function(pathRel) {
     return '/' + pathRel;
 };
 
 /**
  * @param {String} srcRoot Absolute path to the source root directory.
- * @param {String} pathRel Path to the JS file relative to the source root.
+ * @param {String} pathRel Path to the JS file relative to the source root (WITHOUT a leading slash!).
  * @class
  * @constructor
  */
 var File = function(srcRoot, pathRel) {
+    /**
+     * Absolute path to the source root directory.
+     * @type {String}
+     * @example
+     * /Users/acdvorak/dev/libs/rquirejs/example/src
+     */
     this.srcRoot = srcRoot;
+
+    /**
+     * Path to the JS file relative to the source root (WITHOUT a leading slash!).
+     * @type {String}
+     * @example
+     * modules/array.js
+     */
     this.pathRel = pathRel;
+
+    /**
+     * Absolute path to the JS file.
+     * @type {String}
+     * @example
+     * /Users/acdvorak/dev/libs/rquirejs/example/src/modules/array.js
+     */
     this.pathAbs = path.resolve(this.srcRoot, this.pathRel);
-    this.pathNorm = _normalize(this.pathRel);
+
+    /**
+     * Same as {@link #pathRel}, but with a leading slash.
+     * @type {String}
+     * @example
+     * /modules/array.js
+     */
+    this.pathCanonical = _canonicalize(this.pathRel);
+
+    /**
+     * Path to the JS file's parent directory relative to the source root (WITHOUT a leading slash!).
+     * @type {String}
+     * @example
+     * modules
+     */
     this.parentRel = path.dirname(this.pathRel);
+
+    /**
+     * Absolute path to the JS file's parent directory.
+     * @type {String}
+     * @example
+     * /Users/acdvorak/dev/libs/rquirejs/example/src/modules
+     */
     this.parentAbs = path.dirname(this.pathAbs);
 
-    this._fileContents = null;
-    this._strippedFileContents = null;
-    this._fileContentsPathNormalized = null;
+    this._rawSource = null;
+    this._strippedSource = null;
+    this._canonicalSource = null;
     this._directDependencies = null;
 
-    this._pathNormMap = {};
+    /**
+     * Map of raw require() paths to their canonical form.
+     * @type {Object}
+     * @private
+     */
+    this._canonicalPathMap = {};
 };
 
 var _match = function(stripped, regex) {
-    return (stripped.match(regex) || [])
-        .map(function(str) {
-            return new RegExp(regex).exec(str);
-        });
+    var matches = (stripped.match(regex) || []);
+    return matches.map(function(str) {
+        return new RegExp(regex).exec(str);
+    });
 };
 
 File.prototype = {
 
-    _getFileContents: function() {
+    _getRawSource: function() {
         return fs.readFileSync(this.pathAbs, { encoding: 'utf8' });
     },
 
-    _getStrippedFileContents: function() {
-        var fileContents = this.fileContents;
+    _getStrippedSource: function() {
+        var fileContents = this.rawSource;
         return fileContents
             .replace(rBlockComment, '')
             .replace(rLineComment, '')
         ;
     },
 
-    _getFileContentsPathNormalized: function() {
-        var fileContents = this.fileContents;
+    _getCanonicalSource: function() {
+        var fileContents = this.rawSource;
         fileContents = this._normalize(fileContents, rRequireSingleQuote);
         fileContents = this._normalize(fileContents, rRequireDoubleQuote);
         return fileContents;
     },
 
-    _normalize: function(contents, regex) {
+    _normalize: function(source, regex) {
         var self = this;
-        return contents.replace(regex, function(matchSubstring, badPath, offset, totalString) {
-            return matchSubstring.replace(badPath, self._pathNormMap[badPath]);
+        return source.replace(regex, function(matchSubstring, badPath, offset, totalString) {
+            return matchSubstring.replace(badPath, self._canonicalPathMap[badPath]);
         });
     },
 
     _getDirectDependencies: function() {
         var self = this
-          , stripped = this.strippedFileContents
+          , stripped = this.strippedSource
           , single   = _match(stripped, rRequireSingleQuote)
           , double   = _match(stripped, rRequireDoubleQuote)
           , matches  = [].concat(single).concat(double)
         ;
         return matches.map(function(match) {
-            var depPathRelToSelf = rJSExt.test(match[1]) ? match[1] : match[1] + '.js'
+            var rawPath = match[1]
+              , depPathRelToSelf = rJSExt.test(rawPath) ? rawPath : rawPath + '.js'
               , depPathAbs = path.resolve(self.parentAbs, depPathRelToSelf)
               , depPathRelToRoot = path.relative(self.srcRoot, depPathAbs)
             ;
-            self._pathNormMap[match[1]] = _normalize(depPathRelToRoot);
+            self._canonicalPathMap[rawPath] = _canonicalize(depPathRelToRoot);
             return depPathRelToRoot;
         });
     },
@@ -98,24 +144,28 @@ File.prototype = {
 
 Object.defineProperties(File.prototype, {
 
-    fileContents: {
+    rawSource: {
         get: function() {
-            return this._fileContents || (this._fileContents = this._getFileContents());
+            return this._rawSource || (this._rawSource = this._getRawSource());
         }
     },
 
-    strippedFileContents: {
+    strippedSource: {
         get: function() {
-            return this._strippedFileContents || (this._strippedFileContents = this._getStrippedFileContents());
+            return this._strippedSource || (this._strippedSource = this._getStrippedSource());
         }
     },
 
-    fileContentsPathNormalized: {
+    canonicalSource: {
         get: function() {
-            return this._fileContentsPathNormalized || (this._fileContentsPathNormalized = this._getFileContentsPathNormalized());
+            return this._canonicalSource || (this._canonicalSource = this._getCanonicalSource());
         }
     },
 
+    /**
+     * Array of relative paths require()'d by this file.
+     * @type {String[]}
+     */
     directDependencies: {
         get: function() {
             return this._directDependencies || (this._directDependencies = this._getDirectDependencies());

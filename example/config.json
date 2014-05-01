@@ -2,7 +2,7 @@
     "src_root": "src/",
     "main": "main.js",
     "module_dir": "modules/",
-    "required_modules": [
+    "base_modules": [
         "array",
         "attr",
         "class",

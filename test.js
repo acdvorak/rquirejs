@@ -4,7 +4,7 @@ var compiler = new Compiler({
     "src_root": "/Users/acdvorak/dev/libs/rquirejs/example/src",
     "main": "main.js",
     "module_dir": "modules/",
-    "required_modules": [
+    "base_modules": [
 //        "array",
 //        "counter"
     ],

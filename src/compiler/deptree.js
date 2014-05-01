@@ -1,7 +1,6 @@
 var fs = require('fs')
   , readdirp = require('readdirp')
   , File = require('../lib/file')
-  , Set = require('../lib/set')
 ;
 
 /**
@@ -16,26 +15,28 @@ var fs = require('fs')
  */
 
 /**
- * @param {String}   srcRootAbs      Absolute path of the source root directory.
- * @param {String[]} srcFilePathsRel Array of .js file paths relative to the source root.
+ * @param {String}   srcRootAbs        Absolute path of the source root directory.
+ * @param {String[]} [srcFilePathsRel] Array of .js file paths relative to the source root.
  * @class
  * @constructor
  */
 var DepTree = function(srcRootAbs, srcFilePathsRel) {
+    srcFilePathsRel = srcFilePathsRel || [];
+
     /** @type {String} */
     this.srcRootAbs = srcRootAbs;
 
     /** @type {File[]} */
-    this.initialSrcFiles = srcFilePathsRel.map(function(filePathRel) { return new File(srcRootAbs, filePathRel); });
+    this._initialSrcFiles = srcFilePathsRel.map(function(filePathRel) { return new File(srcRootAbs, filePathRel); });
 
     /** @type {File[]} */
-    this.allSrcFiles = [];
+    this._allSrcFiles = [];
 
     /** @type {Object} */
-    this.srcFileMap = {};
+    this._srcFileMap = {};
 
     /** @type {File[]} */
-    this.depFiles = [];
+    this.dependencies = [];
 };
 
 DepTree.prototype = {
@@ -54,6 +55,9 @@ DepTree.prototype = {
             .on('error', this._onError.bind(this))
             .on('end',   this._onEnd.bind(this))
             .on('close', this._onClose.bind(this))
+        ;
+
+        entryStream
             .on('end',   function() { return done && done(); })
             .on('close', function() { return done && done(); })
         ;
@@ -66,8 +70,8 @@ DepTree.prototype = {
      */
     _onData: function(fileInfo) {
         var file = new File(this.srcRootAbs, fileInfo.path);
-        this.allSrcFiles.push(file);
-        this.srcFileMap[file.pathRel] = file;
+        this._allSrcFiles.push(file);
+        this._srcFileMap[file.pathRel] = file;
     },
 
     /**
@@ -107,31 +111,39 @@ DepTree.prototype = {
 
     _buildTree: function() {
         var self = this
-          , depMap = {}
+
+            /**
+             * Map of relative file paths to their corresponding {@link File} objects.
+             * @type {Object}
+             */
+          , depFileMap = {}
         ;
-        this.initialSrcFiles.forEach(function(file) {
-            self._buildTreeImpl(depMap, file);
+
+        this._initialSrcFiles.forEach(function(file) {
+            self._buildTreeImpl(depFileMap, file);
         });
 
-        for (var pathRel in depMap) {
-            this.depFiles.push(depMap[pathRel]);
+        for (var pathRel in depFileMap) {
+            this.dependencies.push(depFileMap[pathRel]);
         }
     },
 
-    _buildTreeImpl: function(depMap, file) {
-        if (depMap[file.pathRel]) {
+    _buildTreeImpl: function(depFileMap, file) {
+        // Dependency has already been scanned and parsed.
+        if (depFileMap[file.pathRel]) {
             return;
         }
 
-        depMap[file.pathRel] = file;
+        depFileMap[file.pathRel] = file;
 
         var self = this;
-        var deps = file.directDependencies.map(function(pathRel) {
-            return self.srcFileMap[pathRel];
+        var depFiles = file.directDependencies.map(function(pathRel) {
+            return self._srcFileMap[pathRel];
         });
 
-        deps.forEach(function(depFile) {
-            self._buildTreeImpl(depMap, depFile);
+        // Visit each dependency to get _its_ dependencies.
+        depFiles.forEach(function(depFile) {
+            self._buildTreeImpl(depFileMap, depFile);
         });
     }
 
