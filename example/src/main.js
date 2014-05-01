@@ -1,6 +1,6 @@
 var root = require('root')
   , document = require('document')
-  , array = require('./modules/array-internal')
+  , array = require('ai')
 ;
 
 var _utils = require('./util'),

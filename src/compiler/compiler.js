@@ -43,6 +43,7 @@ var Compiler = function(config) {
     this.config = config;
 
     config.base_modules = config.base_modules || [];
+    config.aliases = config.aliases || {};
 
     var srcRoot = config.src_root,
         main = _utils.normalizePath(config.main),
@@ -78,14 +79,17 @@ Compiler.prototype = {
             }
         );
 
-        var configArg = JSON.stringify({ main: '/' + _utils.normalizePath(this.config.main) });
+        var config = {
+            main: '/' + _utils.normalizePath(this.config.main),
+            aliases: this.config.aliases
+        };
+
+        var configArg = JSON.stringify(config);
         var moduleDefsArg = '{\n' + _utils.indent(moduleDefs.join(',\n')) + '\n}';
 
         var args = [ configArg, moduleDefsArg ].join(',\n');
 
-        var runtime = runtimeTpl;
-        runtime = runtime.replace(/\s*\/\*!__CONFIG_START__!\*\/[\s\S]*\/\*!__CONFIG_END__!\*\/\s*/, '__CONFIG__');
-        runtime = runtime.replace(/(?:\/\*!?)?__CONFIG__(?:!?\*\/)?/g, '\n' + _utils.indent(args) + '\n');
+        var runtime = runtimeTpl.replace(/(?:\/\*!?)?__CONFIG__(?:!?\*\/)?/g, '\n' + _utils.indent(args) + '\n');
 
         fs.writeFileSync(this.config.dest, runtime);
     }

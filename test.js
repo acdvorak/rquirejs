@@ -8,6 +8,9 @@ var compiler = new Compiler({
 //        "array",
 //        "counter"
     ],
+    "aliases": {
+        "ai": "/modules/array-internal.js"
+    },
     "dest": "example/dist/example.js"
 });
 

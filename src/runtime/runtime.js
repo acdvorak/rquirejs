@@ -9,12 +9,16 @@
             'document': function() { return doc; }
         };
 
-        var _pathMap = {
+        var _aliases = {
 //            'shortName': '/long/path/to/file.js'
         };
 
+        for (var alias in config.aliases) {
+            _aliases[alias] = config.aliases[alias];
+        }
+
         var require = function(path) {
-            path = _pathMap[path] || path;
+            path = _aliases[path] || path;
             return _modules[path]();
         };
 
