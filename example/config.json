@@ -1,7 +1,7 @@
 {
     "src_root": "src/",
     "main": "main.js",
-    "module_dir": "modules/",
+    "modules_dir": "modules/",
     "base_modules": [
         "array",
         "attr",

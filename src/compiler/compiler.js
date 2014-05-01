@@ -47,7 +47,7 @@ var Compiler = function(config) {
     var srcRoot = config.src_root,
         main = _utils.normalizePath(config.main),
         baseModules = config.base_modules.map(function(moduleName) {
-            return _utils.resolveModule(config.module_dir, moduleName);
+            return _utils.resolveModule(config.modules_dir, moduleName);
         }),
         allModules = [ main ].concat(baseModules);
 

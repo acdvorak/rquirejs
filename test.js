@@ -3,7 +3,7 @@ var Compiler = require('./src/compiler/compiler.js');
 var compiler = new Compiler({
     "src_root": "/Users/acdvorak/dev/libs/rquirejs/example/src",
     "main": "main.js",
-    "module_dir": "modules/",
+    "modules_dir": "modules/",
     "base_modules": [
 //        "array",
 //        "counter"
