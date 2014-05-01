@@ -13,7 +13,7 @@ var compiler = new Compiler({
     },
     "globals": {
         "_": "_",
-        "$": "!window.Zepto || window.jQuery"
+        "$": "Zepto || jQueryX"
     },
     "dest": "example/dist/example.js"
 });

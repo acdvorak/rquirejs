@@ -35,13 +35,22 @@
                 var args = [ require, module, module.exports ];
 
                 for (var exposedName in config.globals) {
-                    var actualName = config.globals[exposedName];
-                    if (actualName[0] === '!') {
-                        var expr = actualName.substr(1);
-                        args.push(eval(expr));
-                    } else {
-                        args.push(root[actualName]);
+                    var names = config.globals[exposedName].split(/\s*\|\|\s*/g)
+                      , len = names.length
+                      , idx = 0;
+
+                    var finalVal;
+
+                    for (; idx < len; idx++) {
+                        var val = root[names[idx]];
+                        if (val) {
+                            finalVal = val;
+                            break;
+                        }
                     }
+
+                    args.push(finalVal);
+                    finalVal = undefined;
                 }
 
                 definition.apply(null, args);
