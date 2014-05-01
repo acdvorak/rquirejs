@@ -25,19 +25,21 @@ var Compiler = function(config) {
         main = _normalizePath(config.main),
         reqModules = config.required_modules.map(function(moduleName) { return _normalizeModulePath(config.module_dir, moduleName); });
 
-    var self = this;
-
     this.depTree = new DepTree(srcRoot, [ main ].concat(reqModules));
-    this.depTree.scan(function() {
-        console.log(self.depTree.depFiles.map(function(file) {
-            console.log(file.pathNorm + ':\n');
-            console.log('    ' + file.fileContentsPathNormalized.split('\n').join('\n    '));
-            return file.pathNorm;
-        }));
-    });
 };
 
 Compiler.prototype = {
+
+    compile: function() {
+        var self = this;
+        this.depTree.scan(function() {
+            console.log(self.depTree.depFiles.map(function(file) {
+                console.log(file.pathNorm + ':\n');
+                console.log('    ' + file.fileContentsPathNormalized.split('\n').join('\n    '));
+                return file.pathNorm;
+            }));
+        });
+    }
 
 };
 
