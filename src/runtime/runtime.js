@@ -38,7 +38,7 @@
             _define(path, definitions[path]);
         }
 
-        require(config.main || '/main.js');
+        require(config.main);
 
     }(window, window, document));
 
@@ -48,10 +48,8 @@
     },
     {
         '/util.js': function(require, module, exports) {
-            /*! Module source code goes here */
-
+            // Module source code goes here
             var window = require('window');
-
             module.exports = {
                 alert: function() {
                     window.alert.apply(null, arguments);
@@ -59,7 +57,7 @@
             };
         },
         '/modules/counter.js': function(require, module, exports) {
-            /*! Module source code goes here */
+            // Module source code goes here
             var _private = 1;
             module.exports = {
                 increment: function() {
@@ -68,14 +66,12 @@
             };
         },
         '/main.js': function(require, module, exports) {
-            /*! Module source code goes here */
-
+            // Module source code goes here
             var root = require('root')
               , document = require('document')
               , _utils = require('/util.js')
               , _counter = require('/modules/counter.js')
             ;
-
             module.exports = {
                 run: function() {
                     document.onclick = function() {
@@ -83,7 +79,6 @@
                     };
                 }
             };
-
             root.start = function() {
                 module.exports.run();
             };

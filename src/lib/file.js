@@ -12,6 +12,10 @@ var rBlockComment = new RegExp('/\\*[\\s\\S]*?\\*/', 'g')
 
 var rJSExt = /\.js$/;
 
+var _normalize = function(pathRel) {
+    return '/' + pathRel;
+};
+
 /**
  * @param {String} srcRoot Absolute path to the source root directory.
  * @param {String} pathRel Path to the JS file relative to the source root.
@@ -22,6 +26,7 @@ var File = function(srcRoot, pathRel) {
     this.srcRoot = srcRoot;
     this.pathRel = pathRel;
     this.pathAbs = path.resolve(this.srcRoot, this.pathRel);
+    this.pathNorm = _normalize(this.pathRel);
     this.parentRel = path.dirname(this.pathRel);
     this.parentAbs = path.dirname(this.pathAbs);
 
@@ -80,7 +85,7 @@ File.prototype = {
               , depPathAbs = path.resolve(self.parentAbs, depPathRelToSelf)
               , depPathRelToRoot = path.relative(self.srcRoot, depPathAbs)
             ;
-            self._pathNormMap[match[1]] = '/' + depPathRelToRoot;
+            self._pathNormMap[match[1]] = _normalize(depPathRelToRoot);
             return depPathRelToRoot;
         });
     },
