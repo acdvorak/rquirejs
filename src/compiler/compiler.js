@@ -85,7 +85,7 @@ Compiler.prototype = {
 
         var runtime = runtimeTpl;
         runtime = runtime.replace(/\s*\/\*!__CONFIG_START__!\*\/[\s\S]*\/\*!__CONFIG_END__!\*\/\s*/, '__CONFIG__');
-        runtime = runtime.replace(/__CONFIG__/g, '\n' + _utils.indent(args) + '\n');
+        runtime = runtime.replace(/(?:\/\*!?)?__CONFIG__(?:!?\*\/)?/g, '\n' + _utils.indent(args) + '\n');
 
         fs.writeFileSync(this.config.dest, runtime);
     }
