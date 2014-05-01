@@ -1,3 +1,3 @@
-"__PATH__": function(require, module, exports, __GLOBALS__) {
+"__PATH__": function(require, module, exports) {
 __SOURCE__
 }

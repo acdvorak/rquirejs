@@ -1,3 +1,4 @@
+/*!__INTRO__!*/
 (function(config, definitions) {
 
     (function(root, win, doc) {
@@ -29,32 +30,8 @@
                 if (module) {
                     return module.exports;
                 }
-
                 module = { exports: {} };
-
-                var args = [ require, module, module.exports ];
-
-                for (var exposedName in config.globals) {
-                    var names = config.globals[exposedName].split(/\s*\|\|\s*/g)
-                      , len = names.length
-                      , idx = 0;
-
-                    var finalVal;
-
-                    for (; idx < len; idx++) {
-                        var val = root[names[idx]];
-                        if (val) {
-                            finalVal = val;
-                            break;
-                        }
-                    }
-
-                    args.push(finalVal);
-                    finalVal = undefined;
-                }
-
-                definition.apply(null, args);
-
+                definition.apply(null, [ require, module, module.exports ]);
                 return module.exports;
             };
         };
@@ -67,4 +44,5 @@
 
     }(window, window, document));
 
-}(/*__CONFIG__*/));
+}(/*!__CONFIG__!*/));
+/*!__OUTRO__!*/

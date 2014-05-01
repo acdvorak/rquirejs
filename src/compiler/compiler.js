@@ -34,6 +34,18 @@ var _utils = {
                 throw new Error('Required config property "' + propName + '" not found');
             }
         });
+    },
+
+    keys: function(obj) {
+        return Object.keys(obj);
+    },
+
+    values: function(obj) {
+        var arr = [];
+        for (var key in obj) {
+            arr.push(obj[key]);
+        }
+        return arr;
     }
 };
 
@@ -76,7 +88,6 @@ Compiler.prototype = {
                 return moduleTpl
                     .replace(/__PATH__/g, file.pathCanonical)
                     .replace(/__SOURCE__/g, _utils.indent(file.canonicalSource.trim()))
-                    .replace(/__GLOBALS__/g, Object.keys(self.config.globals).concat([ 'undefined' ]).join(', '))
                     .trim()
                 ;
             }
@@ -84,8 +95,7 @@ Compiler.prototype = {
 
         var config = {
             main: '/' + _utils.normalizePath(this.config.main),
-            aliases: this.config.aliases,
-            globals: this.config.globals
+            aliases: this.config.aliases
         };
 
         var configArg = JSON.stringify(config);
@@ -93,7 +103,11 @@ Compiler.prototype = {
 
         var args = [ configArg, moduleDefsArg ].join(',\n');
 
-        var runtime = runtimeTpl.replace(/(?:\/\*!?)?__CONFIG__(?:!?\*\/)?/g, '\n' + _utils.indent(args) + '\n');
+        var runtime = runtimeTpl
+            .replace(/(?:\/\*!?)?__CONFIG__(?:!?\*\/)?/g, '\n' + _utils.indent(args) + '\n')
+            .replace(/(?:\/\*!?)?__INTRO__(?:!?\*\/)?/g, '(function(' + _utils.keys(self.config.globals).concat([ 'undefined' ]).join(', ') + ') {')
+            .replace(/(?:\/\*!?)?__OUTRO__(?:!?\*\/)?/g, '}(' + _utils.values(self.config.globals).join(', ') + '));')
+            ;
 
         fs.writeFileSync(this.config.dest, runtime);
     }
