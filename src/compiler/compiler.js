@@ -44,6 +44,7 @@ var Compiler = function(config) {
 
     config.base_modules = config.base_modules || [];
     config.aliases = config.aliases || {};
+    config.globals = config.globals || {};
 
     var srcRoot = config.src_root,
         main = _utils.normalizePath(config.main),
@@ -62,7 +63,8 @@ Compiler.prototype = {
     },
 
     _onScanComplete: function() {
-        var moduleTpl = _utils.readFileSyncRel('../runtime/module-definition.tpl.js')
+        var self = this
+          , moduleTpl = _utils.readFileSyncRel('../runtime/module-definition.tpl.js')
           , runtimeTpl = _utils.readFileSyncRel('../runtime/runtime.js')
         ;
         var moduleDefs = this.depTree.dependencies.map(
@@ -74,6 +76,7 @@ Compiler.prototype = {
                 return moduleTpl
                     .replace(/__PATH__/g, file.pathCanonical)
                     .replace(/__SOURCE__/g, _utils.indent(file.canonicalSource.trim()))
+                    .replace(/__GLOBALS__/g, Object.keys(self.config.globals).concat([ 'undefined' ]).join(', '))
                     .trim()
                 ;
             }
@@ -81,7 +84,8 @@ Compiler.prototype = {
 
         var config = {
             main: '/' + _utils.normalizePath(this.config.main),
-            aliases: this.config.aliases
+            aliases: this.config.aliases,
+            globals: this.config.globals
         };
 
         var configArg = JSON.stringify(config);

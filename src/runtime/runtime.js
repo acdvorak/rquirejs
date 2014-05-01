@@ -22,15 +22,30 @@
             return _modules[path]();
         };
 
-        var _define = function(path, def) {
+        var _define = function(path, definition) {
             var module;
 
             _modules[path] = function() {
                 if (module) {
                     return module.exports;
                 }
+
                 module = { exports: {} };
-                def(require, module, module.exports);
+
+                var args = [ require, module, module.exports ];
+
+                for (var exposedName in config.globals) {
+                    var actualName = config.globals[exposedName];
+                    if (actualName[0] === '!') {
+                        var expr = actualName.substr(1);
+                        args.push(eval(expr));
+                    } else {
+                        args.push(root[actualName]);
+                    }
+                }
+
+                definition.apply(null, args);
+
                 return module.exports;
             };
         };

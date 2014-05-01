@@ -9,7 +9,11 @@ var _utils = require('./util'),
 module.exports = {
     run: function() {
         document.onclick = function() {
-            _utils.alert(_counter.increment());
+            _utils.alert(
+                _counter.increment() + '\n' +
+                _.all([ 1, 2, 3 ], function(val) { return val > 0; }) + '\n' +
+                $('body').hasClass('blah')
+            );
         };
     }
 };
