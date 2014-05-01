@@ -80,7 +80,7 @@ File.prototype = {
               , depPathAbs = path.resolve(self.parentAbs, depPathRelToSelf)
               , depPathRelToRoot = path.relative(self.srcRoot, depPathAbs)
             ;
-            self._pathNormMap[match[1]] = depPathRelToRoot;
+            self._pathNormMap[match[1]] = '/' + depPathRelToRoot;
             return depPathRelToRoot;
         });
     },

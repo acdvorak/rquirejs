@@ -6,27 +6,19 @@
             'root': function() { return root; },
             'window': function() { return win; },
             'document': function() { return doc; },
-            'path/to/js/module_without_extension': function() { return module; }
+            '/path/to/module.js': function() { return module; }
         };
 
         var _pathMap = {
-            'shortName': 'long/path/to/file_without_extension'
-        };
-
-        var rjsExt = /\.js$/;
-        var _normalize = function(path) {
-            return path && rjsExt.test(path) ? path.replace(rjsExt, '') : path;
+            'shortName': '/long/path/to/file.js'
         };
 
         var require = function(path) {
-            path = _normalize(path);
             path = _pathMap[path] || path;
-            path = _normalize(path);
             return _modules[path]();
         };
 
         var _define = function(path, def) {
-            path = _normalize(path);
             _modules[path] = (function() {
                 var module;
 
@@ -46,16 +38,16 @@
             _define(path, definitions[path]);
         }
 
-        require(config.main || 'main');
+        require(config.main || '/main.js');
 
     }(window, window, document));
 
 }(
     {
-        main: 'main'
+        main: '/main.js'
     },
     {
-        'util': function(require, module, exports) {
+        '/util.js': function(require, module, exports) {
             /*! Module source code goes here */
 
             var window = require('window');
@@ -66,7 +58,7 @@
                 }
             };
         },
-        'modules/counter': function(require, module, exports) {
+        '/modules/counter.js': function(require, module, exports) {
             /*! Module source code goes here */
             var _private = 1;
             module.exports = {
@@ -75,13 +67,13 @@
                 }
             };
         },
-        'main': function(require, module, exports) {
+        '/main.js': function(require, module, exports) {
             /*! Module source code goes here */
 
             var root = require('root')
               , document = require('document')
-              , _utils = require('util')
-              , _counter = require('modules/counter')
+              , _utils = require('/util.js')
+              , _counter = require('/modules/counter.js')
             ;
 
             module.exports = {
