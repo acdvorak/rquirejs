@@ -1,27 +1,27 @@
 /*!__GLOBAL_NAMES__!*/
 (function(config, definitions, undefined) {
 
-    var _modules = {
+    var modules = {
 //        '/path/to/module.js': function() { return module; },
     };
 
-    var _aliases = {
+    var aliases = {
 //        'shortName': '/long/path/to/file.js'
     };
 
     for (var alias in config.aliases) {
-        _aliases[alias] = config.aliases[alias];
+        aliases[alias] = config.aliases[alias];
     }
 
     var require = function(path) {
-        path = _aliases[path] || path;
-        return _modules[path]();
+        path = aliases[path] || path;
+        return modules[path]();
     };
 
-    var _define = function(path, definition) {
+    var define = function(path, definition) {
         var module;
 
-        _modules[path] = function() {
+        modules[path] = function() {
             if (module) {
                 return module.exports;
             }
@@ -32,7 +32,7 @@
     };
 
     for (var path in definitions) {
-        _define(path, definitions[path]);
+        define(path, definitions[path]);
     }
 
     require(config.main);
