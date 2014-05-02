@@ -12,4 +12,4 @@ Build Dependencies
 Runtime Dependencies
 --------------------
 
-*   [Underscore](http://underscorejs.org/)
+None!  :-)
