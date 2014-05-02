@@ -7,6 +7,7 @@ var _ = require('underscore')
 
 var rLeadingSlash = /^\//
   , rJSExt = /\.js$/
+  , rLineComment  = new RegExp('[ \\t]*//.*', 'g')
 ;
 
 var _utils = {
@@ -65,6 +66,10 @@ var _utils = {
     replace: function(source, find, replacement) {
         var regex = new RegExp('[ \\t]*(?:/\\*!?)?__' + find + '__(?:!?\\*/)?[ \\t]*', 'g');
         return source.replace(regex, replacement);
+    },
+
+    stripLineComments: function(source) {
+        return source.replace(rLineComment, '');
     }
 };
 
@@ -146,6 +151,7 @@ Compiler.prototype = {
         var moduleDefsArg = '{\n' + _utils.indent(moduleDefs.join(',\n')) + '\n}';
 
         var runtime = runtimeTpl;
+        runtime = _utils.stripLineComments(runtime);
         runtime = _utils.replace(runtime, 'CONFIG', _utils.indent(configArg));
         runtime = _utils.replace(runtime, 'MODULE_DEFINITIONS', _utils.indent(moduleDefsArg));
         runtime = this._addGlobals(runtime);
