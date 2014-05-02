@@ -1,4 +1,4 @@
-var Compiler = require('../src/compiler/compiler.js');
+var Compiler = require('../lib/compiler/compiler.js');
 
 var compiler = new Compiler({
     "src_root": "example/src/",
