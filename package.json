@@ -1,0 +1,39 @@
+{
+  "name": "rquirejs",
+  "version": "0.0.0",
+  "description": "Micro RequireJS-like build system for modular JavaScript libraries",
+  "main": "test.js",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "dependencies": {
+    "file": "^0.2.2",
+    "readdirp": "^1.0.1",
+    "underscore": "^1.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/acdvorak/rquirejs.git"
+  },
+  "keywords": [
+    "require",
+    "requirejs",
+    "dependency",
+    "modular",
+    "library",
+    "build",
+    "grunt",
+    "plugin"
+  ],
+  "author": "Andrew C. Dvorak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/acdvorak/rquirejs/issues"
+  },
+  "homepage": "https://github.com/acdvorak/rquirejs"
+}
