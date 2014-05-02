@@ -1,9 +1,12 @@
-var fs = require('fs')
+var _ = require('underscore')
+  , fs = require('fs')
   , path = require('path')
   , DepTree = require('./deptree')
 ;
 
-var rJSExt = /\.js$/;
+var rLeadingSlash = /^\//
+  , rJSExt = /\.js$/
+;
 
 var _utils = {
     readFileSyncRel: function(pathRelativeToThisFile) {
@@ -17,15 +20,37 @@ var _utils = {
 
     normalizePath: function(path) {
         var norm = path;
-        norm = norm.replace(/^\//, '');
+        norm = norm.replace(rLeadingSlash, '');
         norm = rJSExt.test(norm) ? norm : (norm + '.js');
         return norm;
     },
 
-    resolveModule: function(moduleDir, moduleName) {
-        var moduleDirNorm = moduleDir;
-        moduleDirNorm = (moduleDirNorm[moduleDirNorm.length - 1] === '/') ? moduleDirNorm : (moduleDirNorm + '/');
-        return _utils.normalizePath(moduleDirNorm + moduleName);
+    resolveModule: function(modulesDir, moduleName) {
+        var modulesDirNorm = modulesDir;
+        modulesDirNorm = (modulesDirNorm[modulesDirNorm.length - 1] === '/') ? modulesDirNorm : (modulesDirNorm + '/');
+        return _utils.normalizePath(modulesDirNorm + moduleName);
+    },
+
+    resolveModules: function(modulesDir, moduleNames) {
+        var utils = this;
+        return moduleNames.map(function(moduleName) {
+            return utils.resolveModule(modulesDir, moduleName);
+        });
+    },
+
+    resolveAliases: function(aliases) {
+        return _
+            .values(aliases)
+            .filter(function(value) {
+                return rLeadingSlash.test(value) || rJSExt.test(value);
+            })
+            .map(function(pathDirty) {
+                var pathRel = pathDirty;
+                pathRel = pathRel.replace(rLeadingSlash, '');
+                pathRel = rJSExt.test(pathRel) ? pathRel : (pathRel + '.js');
+                return pathRel;
+            })
+        ;
     },
 
     validateConfig: function(config, propNames) {
@@ -34,18 +59,6 @@ var _utils = {
                 throw new Error('Required config property "' + propName + '" not found');
             }
         });
-    },
-
-    keys: function(obj) {
-        return Object.keys(obj);
-    },
-
-    values: function(obj) {
-        var arr = [];
-        for (var key in obj) {
-            arr.push(obj[key]);
-        }
-        return arr;
     },
 
     replace: function(source, find, replacement) {
@@ -59,18 +72,19 @@ var Compiler = function(config) {
 
     this.config = config;
 
-    config.base_modules = config.base_modules || [];
+    config.user_modules = config.user_modules || [];
     config.aliases = config.aliases || {};
     config.globals = config.globals || {};
 
-    var srcRoot = config.src_root,
+    var srcRootAbs = config.src_root,
         main = _utils.normalizePath(config.main),
-        baseModules = config.base_modules.map(function(moduleName) {
-            return _utils.resolveModule(config.modules_dir, moduleName);
-        }),
-        allModules = [ main ].concat(baseModules);
+        userModules = _utils.resolveModules(config.modules_dir, config.user_modules),
+        aliasModules = _utils.resolveAliases(config.aliases),
+        srcFilePathsRel = [].concat(main, userModules, aliasModules);
 
-    this.depTree = new DepTree(srcRoot, allModules);
+    srcFilePathsRel = _.uniq(srcFilePathsRel);
+
+    this.depTree = new DepTree(srcRootAbs, srcFilePathsRel);
 };
 
 Compiler.prototype = {
@@ -80,8 +94,8 @@ Compiler.prototype = {
     },
 
     _addGlobals: function(runtime) {
-        var names = _utils.keys(this.config.globals),
-            values = _utils.values(this.config.globals);
+        var names = _.keys(this.config.globals),
+            values = _.values(this.config.globals);
 
         if (this.config.safe_undefined === true) {
             names.push('undefined');
