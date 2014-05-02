@@ -2,7 +2,7 @@
   "name": "rquirejs",
   "version": "0.1.0",
   "description": "Micro RequireJS-like build system for modular JavaScript libraries",
-  "main": "./lib/rquire.js",
+  "main": "rquire.js",
   "files": [
     "LICENSE",
     "README.md"
@@ -44,5 +44,5 @@
     "build",
     "grunt",
     "plugin"
-  ],
+  ]
 }

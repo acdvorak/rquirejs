@@ -1,4 +1,4 @@
-var Compiler = require('./compiler/compiler.js');
+var Compiler = require('./lib/compiler/compiler.js');
 
 module.exports = {
     compile: function(config) {
