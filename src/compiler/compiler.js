@@ -134,8 +134,8 @@ Compiler.prototype = {
     },
 
     _onScanComplete: function() {
-        var moduleTpl = _utils.readFileSyncRel('../runtime/module-definition.tpl.js')
-          , runtimeTpl = _utils.readFileSyncRel('../runtime/runtime.js')
+        var moduleTpl = _utils.readFileSyncRel('../runtime/module.tpl.js')
+          , runtimeTpl = _utils.readFileSyncRel('../runtime/runtime.tpl.js')
         ;
         var moduleDefs = this.depTree.dependencies.map(
             /**
