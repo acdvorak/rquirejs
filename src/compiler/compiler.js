@@ -8,6 +8,7 @@ var _ = require('underscore')
 var rLeadingSlash = /^\//
   , rJSExt = /\.js$/
   , rLineComment  = new RegExp('[ \\t]*//.*', 'g')
+  , rTrailingWhitespace  = /\s+$/g
 ;
 
 var _utils = {
@@ -70,6 +71,14 @@ var _utils = {
 
     stripLineComments: function(source) {
         return source.replace(rLineComment, '');
+    },
+
+    stripTrailingSpaces: function(source) {
+        return source
+            .split('\n')
+            .map(function(line) { return line.replace(rTrailingWhitespace, ''); })
+            .join('\n')
+        ;
     }
 };
 
@@ -155,6 +164,7 @@ Compiler.prototype = {
         runtime = _utils.replace(runtime, 'CONFIG', _utils.indent(configArg));
         runtime = _utils.replace(runtime, 'MODULE_DEFINITIONS', _utils.indent(moduleDefsArg));
         runtime = this._addGlobals(runtime);
+        runtime = _utils.stripTrailingSpaces(runtime);
 
         mkdirp.sync(path.dirname(this.config.dest));
         fs.writeFileSync(this.config.dest, runtime);
