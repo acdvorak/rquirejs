@@ -1,6 +1,7 @@
 var _ = require('underscore')
   , fs = require('fs')
   , path = require('path')
+  , mkdirp = require('mkdirp')
   , DepTree = require('./deptree')
 ;
 
@@ -150,6 +151,7 @@ Compiler.prototype = {
         runtime = _utils.replace(runtime, 'CONFIG', '\n' + _utils.indent(args) + '\n');
         runtime = this._addGlobals(runtime);
 
+        mkdirp.sync(path.dirname(this.config.dest));
         fs.writeFileSync(this.config.dest, runtime);
     }
 
