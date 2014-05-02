@@ -1,4 +1,6 @@
 {
+    "laxcomma": true,
+    "laxbreak": true,
     "curly":   true,
     "eqeqeq":  true,
     "immed":   true,

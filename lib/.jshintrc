@@ -1,7 +1,5 @@
 {
     "node": true,
-    "laxcomma": true,
-    "laxbreak": true,
     "predef": [
     ]
 }
