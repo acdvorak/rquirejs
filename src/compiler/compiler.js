@@ -142,13 +142,12 @@ Compiler.prototype = {
             aliases: this.config.aliases
         };
 
-        var configArg = JSON.stringify(config);
+        var configArg = JSON.stringify(config, null, 4);
         var moduleDefsArg = '{\n' + _utils.indent(moduleDefs.join(',\n')) + '\n}';
 
-        var args = [ configArg, moduleDefsArg ].join(',\n');
-
         var runtime = runtimeTpl;
-        runtime = _utils.replace(runtime, 'CONFIG', '\n' + _utils.indent(args) + '\n');
+        runtime = _utils.replace(runtime, 'CONFIG', _utils.indent(configArg));
+        runtime = _utils.replace(runtime, 'MODULE_DEFINITIONS', _utils.indent(moduleDefsArg));
         runtime = this._addGlobals(runtime);
 
         mkdirp.sync(path.dirname(this.config.dest));
