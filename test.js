@@ -12,9 +12,11 @@ var compiler = new Compiler({
         "ai": "/modules/array-internal.js"
     },
     "globals": {
+//        "undefined": "'hello'",
         "_": "_",
         "$": "window.Zepto || window.jQuery"
     },
+    "safe_undefined": true,
     "dest": "example/dist/example.js"
 });
 

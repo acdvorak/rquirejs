@@ -1,5 +1,5 @@
-/*!__INTRO__!*/
-(function(config, definitions) {
+/*!__GLOBAL_NAMES__!*/
+(function(config, definitions, undefined) {
 
     (function(root, win, doc) {
 
@@ -45,4 +45,4 @@
     }(window, window, document));
 
 }(/*!__CONFIG__!*/));
-/*!__OUTRO__!*/
+/*!__GLOBAL_VALUES__!*/

@@ -46,6 +46,11 @@ var _utils = {
             arr.push(obj[key]);
         }
         return arr;
+    },
+
+    replace: function(source, find, replacement) {
+        var regex = new RegExp('[ \\t]*(?:/\\*!?)?__' + find + '__(?:!?\\*/)?[ \\t]*', 'g');
+        return source.replace(regex, replacement);
     }
 };
 
@@ -74,9 +79,33 @@ Compiler.prototype = {
         this.depTree.scan(this._onScanComplete.bind(this));
     },
 
+    _addGlobals: function(runtime) {
+        var names = _utils.keys(this.config.globals),
+            values = _utils.values(this.config.globals);
+
+        if (this.config.safe_undefined === true) {
+            names.push('undefined');
+        }
+
+        var retVal = runtime
+          , intro = ''
+          , outro = ''
+        ;
+
+        if (names.length) {
+            retVal = _utils.indent(retVal);
+            intro = '(function(' + names.join(', ') + ') {';
+            outro = '}(' + values.join(', ') + '));';
+        }
+
+        retVal = _utils.replace(retVal, 'GLOBAL_NAMES',  intro);
+        retVal = _utils.replace(retVal, 'GLOBAL_VALUES', outro);
+
+        return retVal;
+    },
+
     _onScanComplete: function() {
-        var self = this
-          , moduleTpl = _utils.readFileSyncRel('../runtime/module-definition.tpl.js')
+        var moduleTpl = _utils.readFileSyncRel('../runtime/module-definition.tpl.js')
           , runtimeTpl = _utils.readFileSyncRel('../runtime/runtime.js')
         ;
         var moduleDefs = this.depTree.dependencies.map(
@@ -103,11 +132,9 @@ Compiler.prototype = {
 
         var args = [ configArg, moduleDefsArg ].join(',\n');
 
-        var runtime = runtimeTpl
-            .replace(/(?:\/\*!?)?__CONFIG__(?:!?\*\/)?/g, '\n' + _utils.indent(args) + '\n')
-            .replace(/(?:\/\*!?)?__INTRO__(?:!?\*\/)?/g, '(function(' + _utils.keys(self.config.globals).concat([ 'undefined' ]).join(', ') + ') {')
-            .replace(/(?:\/\*!?)?__OUTRO__(?:!?\*\/)?/g, '}(' + _utils.values(self.config.globals).join(', ') + '));')
-            ;
+        var runtime = runtimeTpl;
+        runtime = _utils.replace(runtime, 'CONFIG', '\n' + _utils.indent(args) + '\n');
+        runtime = this._addGlobals(runtime);
 
         fs.writeFileSync(this.config.dest, runtime);
     }
