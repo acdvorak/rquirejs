@@ -38,7 +38,7 @@
     require(config.main);
 
 }(
-/*!__CONFIG__!*/,
-/*!__MODULE_DEFINITIONS__!*/
+    /*!__CONFIG__!*/,
+    /*!__MODULE_DEFINITIONS__!*/
 ));
 /*!__GLOBAL_VALUES__!*/
