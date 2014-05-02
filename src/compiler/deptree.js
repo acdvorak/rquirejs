@@ -75,12 +75,13 @@ DepTree.prototype = {
     },
 
     /**
-     * Passes a non-fatal Error that prevents a file/directory from being processed (i.e., if it is inaccessible to the user).
+     * Passes a non-fatal Error that prevents a file/directory from being processed (i.e., if it is inaccessible
+     * to the user).
      * @param {Error} err
      * @private
      */
     _onWarn: function(err) {
-        console.warn('warn: ', err);
+        console.warn('warning: ', err);
     },
 
     /**
@@ -97,16 +98,17 @@ DepTree.prototype = {
      * @private
      */
     _onEnd: function() {
-        console.log('end');
         this._buildTree();
     },
 
     /**
-     * Called when the stream is destroyed via stream.destroy() (which could be useful if you want to manually abort even on a non fatal error) - at that point the stream is no longer readable and no more entries, warning or errors are emitted.
+     * Called when the stream is destroyed via stream.destroy() (which could be useful if you want to manually abort
+     * even on a non fatal error) - at that point the stream is no longer readable and no more entries, warning or
+     * errors are emitted.
      * @private
      */
     _onClose: function() {
-        console.log('close');
+        console.warn('close');
     },
 
     _buildTree: function() {
