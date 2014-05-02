@@ -2,7 +2,7 @@
   "name": "rquirejs",
   "version": "0.0.0",
   "description": "Micro RequireJS-like build system for modular JavaScript libraries",
-  "main": "test.js",
+  "main": "example/build.js",
   "directories": {
     "example": "example",
     "test": "test"
