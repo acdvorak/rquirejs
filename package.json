@@ -1,9 +1,11 @@
 {
   "name": "rquirejs",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Micro RequireJS-like build system for modular JavaScript libraries",
   "main": "rquire.js",
   "files": [
+    "lib",
+    "rquire.js",
     "LICENSE",
     "README.md"
   ],
